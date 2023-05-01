@@ -39,7 +39,7 @@
                     #|     DHCP Client: enabled;
                     #| Login
                     #|     admin user protected by password
-                    
+
                     :global ssid;
                     :global defconfMode;
                     :log info "Starting defconf script";
@@ -55,13 +55,13 @@
                           :log warning "DefConf: Unable to find ethernet interfaces";
                           /quit;
                         }
-                        :delay 1s; :set count ($count +1); 
+                        :delay 1s; :set count ($count +1);
                       };
                       :local count 0;
-                      :while ([/interface wireless print count-only] < 2) do={ 
+                      :while ([/interface wireless print count-only] < 2) do={
                         :set count ($count +1);
                         :if ($count = 40) do={
-                          :log warning "DefConf: Unable to find wireless interface(s)"; 
+                          :log warning "DefConf: Unable to find wireless interface(s)";
                           /ip address add address=192.168.88.1/24 interface=ether1 comment="defconf";
                           /quit
                         }
@@ -95,7 +95,7 @@
                          set allow-remote-requests=yes
                          static add name=router.lan address=192.168.88.1 comment=defconf
                      }
-                    
+
                       /interface wireless {
                     :local ifcId [/interface wireless find where default-name=wlan1]
                     :local currentName [/interface wireless get $ifcId name]
@@ -178,9 +178,9 @@
                      /system routerboard mode-button set on-event=dark-mode
                      /system script add name=dark-mode comment="defconf" source={
                        :if ([system leds settings get all-leds-off] = "never") do={
-                         /system leds settings set all-leds-off=immediate 
+                         /system leds settings set all-leds-off=immediate
                        } else={
-                         /system leds settings set all-leds-off=never 
+                         /system leds settings set all-leds-off=never
                        }
                      }
                     }
@@ -235,7 +235,7 @@
                      /interface wireless reset-configuration wlan1
                      /interface wireless reset-configuration wlan2
                      /interface wireless security-profile set default mode=none\
-                          authentication-types="" disable-pmkid=no wpa2-pre-shared-key="" comment="" 
+                          authentication-types="" disable-pmkid=no wpa2-pre-shared-key="" comment=""
                       /caps-man manager set enabled=no
                       /caps-man manager interface remove [find comment="defconf"]
                       /caps-man manager interface set [ find default=yes ] forbid=no
@@ -246,29 +246,29 @@
                     :log info Defconf_script_finished;
                     :set defconfMode;
                     :set ssid;
-                    
+
   caps-mode-script: #-------------------------------------------------------------------------------
                     # Note: script will not execute at all (will throw a syntax error) if
                     #       dhcp or wireless-fp packages are not installed
                     #-------------------------------------------------------------------------------
-                    
+
                     #| CAP configuration
                     #|
                     #|   Wireless interfaces are set to be managed by CAPsMAN.
                     #|   All ethernet interfaces and CAPsMAN managed interfaces are bridged.
                     #|   DHCP client is set on bridge interface.
-                    
+
                     # bridge port name
                     :global brName  "bridgeLocal";
                     :global logPref "defconf:";
-                    
-                    
+
+
                     :global action;
-                    
+
                     :log info $action
-                    
+
                     :if ($action = "apply") do={
-                    
+
                       # wait for ethernet interfaces
                       :local count 0;
                       :while ([/interface ethernet find] = "") do={
@@ -278,10 +278,10 @@
                         }
                         :delay 1s; :set count ($count + 1);
                       }
-                    
+
                       :local macSet 0;
                       :local tmpMac "";
-                    
+
                       :foreach k in=[/interface ethernet find] do={
                         # first ethernet is found; add bridge and set mac address of the ethernet port
                         :if ($macSet = 0) do={
@@ -292,17 +292,17 @@
                         # add bridge ports
                         /interface bridge port add bridge=$brName interface=$k comment="defconf"
                       }
-                    
+
                       # try to add dhcp client on bridge interface (may fail if already exist)
                       :do {
                         /ip dhcp-client add interface=$brName disabled=no comment="defconf"
                       } on-error={ :log warning "$logPref unable to add dhcp client";}
-                    
-                    
+
+
                       # try to configure caps (may fail if for example specified interfaces are missing)
                       :local interfacesList "";
                       :local bFirst 1;
-                    
+
                       # wait for wireless interfaces
                       :while ([/interface wireless find] = "") do={
                         :if ($count = 30) do={
@@ -311,7 +311,7 @@
                         }
                         :delay 1s; :set count ($count + 1);
                       }
-                    
+
                       # delay just to make sure that all wireless interfaces are loaded
                       :delay 5s;
                       :foreach i in=[/interface wireless find] do={
@@ -326,20 +326,20 @@
                         /interface wireless cap
                           set enabled=yes interfaces=$interfacesList discovery-interfaces=$brName bridge=$brName
                       } on-error={ :log warning "$logPref unable to configure caps";}
-                    
+
                     }
-                    
+
                     :if ($action = "revert") do={
                       :do {
                         /interface wireless cap
                           set enabled=no interfaces="" discovery-interfaces="" bridge=none
                       } on-error={ :log warning "$logPref unable to unset caps";}
-                    
+
                       :local o [/ip dhcp-client find comment="defconf"]
                       :if ([:len $o] != 0) do={ /ip dhcp-client remove $o }
-                    
+
                       /interface bridge port remove [find comment="defconf"]
                       /interface bridge remove [find comment="defconf"]
-                    
+
                     }
-     custom-script: 
+     custom-script:

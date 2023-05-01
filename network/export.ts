@@ -12,7 +12,7 @@ import {devices} from "./configs";
         username: 'admin',
         host: device.ip,
         privateKey: await readFile('/Users/johntron/.ssh/id_rsa'),
-        password: 'f&5got$Lhsg6Powe^Na4'
+        password: ''
     });
     client.connect();
     const result = await client.run('/interfaces');
