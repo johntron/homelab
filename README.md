@@ -78,4 +78,30 @@ Now back in Longhorn, go to Settings > Backups and use:
 * s3://backups@desktop/
 * minio-backup
 
+## Next
+
+* Use Windows VM to create BIOS upgrade media for tiny1/2
+* Find some way to avoid changing EDID's (1920 for itx, 1280 for minis)
+* RouterOS terraform to turn on netboot.xyz via PXE boot
+* cloud-config server for Harvester
+* Use terraform to create volumes
+* Terraform minio server for S3 backup server
+* ... or ...
+* Use something like busybox to mount volumes and copy files to them
+* Terraform for metallb
+* ... home assistant
+* ... ghost
+
+## Quirks
+
+* tiny1 supports KVM, but tiny2 does not
+* Pikvm mass storage _may_ interfere with keyboard / mouse on tiny1/2
+* Keyboard won't work during boot for tiny1/2:
+  * use Logitech keyboard
+  * physically disconnect pikvm USB
+* tiny1/2 and itx require different EDID's in pikvm:
+  * itx: 1920
+  * tiny1/2: 1280
+* ... see /home/pikvm/edids/README.md
+
 [diagram]: docs/diagrams/out/Layer%201.png
