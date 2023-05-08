@@ -81,6 +81,7 @@ Now back in Longhorn, go to Settings > Backups and use:
 ## Next
 
 * Use Windows VM to create BIOS upgrade media for tiny1/2
+* ... try to enable KVM on tiny2?
 * Find some way to avoid changing EDID's (1920 for itx, 1280 for minis)
 * RouterOS terraform to turn on netboot.xyz via PXE boot
 * cloud-config server for Harvester
@@ -91,6 +92,7 @@ Now back in Longhorn, go to Settings > Backups and use:
 * Terraform for metallb
 * ... home assistant
 * ... ghost
+* Terraform for Meshcommander to access KVM on tiny1?
 
 ## Quirks
 
