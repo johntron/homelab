@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "ipxe"
+version = "0.1.0"
+description = ""
+authors = ["'John Syrinek' <john.syrinek@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pypxe = "^1.8.4"
+psutil = "^5.9.5"
+gitpython = "^3.1.31"
+tqdm = "^4.65.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
