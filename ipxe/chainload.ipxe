@@ -1,0 +1,18 @@
+#!ipxe
+
+echo before DHCP
+show ip ||
+show mac ||
+show dns ||
+show gateway ||
+show asset ||
+
+echo DHCP
+show ip ||
+show mac ||
+show dns ||
+show gateway ||
+show asset ||
+
+chain http://{bootserver}:8000/?mac=${{net0/mac:uristring}} ||
+

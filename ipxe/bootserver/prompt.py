@@ -3,8 +3,10 @@ import socket
 
 import psutil
 
+from .options import options
 
-def get_ip():
+
+def set_ip():
     def interfaces():
         print("Interfaces:")
         iflist = list(psutil.net_if_addrs().keys())
@@ -21,6 +23,9 @@ def get_ip():
         print(f"Got IP {address} from {ifname}")
         return address
 
+    if options.bootserver:
+        print(f"Using {options.bootserver} for bootserver")
+        return
     iflist = interfaces()
     ifname = choose_interface()
-    return ip(ifname)
+    options.bootserver_ip = ip(ifname)

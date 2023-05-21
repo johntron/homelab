@@ -21,19 +21,25 @@ class CloneProgress(RemoteProgress):
 
 def clone():
     if options.overwrite_ipxe:
-        print(f"Overwriting existing iPXE at {options.ipxe_repo_path}")
-        shutil.rmtree(options.ipxe_repo_path, ignore_errors=True)
+        print(f"Overwriting existing iPXE at {options.ipxe}")
+        shutil.rmtree(options.ipxe, ignore_errors=True)
 
-    if os.path.exists(options.ipxe_repo_path):
-        print(f"iPXE exists at {options.ipxe_repo_path}")
+    if os.path.exists(options.ipxe):
+        print(f"iPXE exists at {options.ipxe}")
         return
 
-    print(f"Cloning iPXE from {options.ipxe_git_url} to {options.ipxe_repo_path}")
-    Repo.clone_from(options.ipxe_git_url, options.ipxe_repo_path, progress=CloneProgress())
+    print(f"Cloning iPXE from {options.ipxe_git} to {options.ipxe}")
+    Repo.clone_from(options.ipxe_git, options.ipxe, progress=CloneProgress())
 
 
 def render_chainloader():
-    pass
+    print(f"Using {options.bootserver} in chainloader")
+    with open(options.chainload, 'r') as f:
+        template = f.read()
+    rendered = template.format(bootserver=options.bootserver)
+    with open(options.chainload_output, 'w') as f:
+        f.write(rendered)
+    print(f"Rendered chainloader script to {options.chainload_output}")
 
 
 def build():

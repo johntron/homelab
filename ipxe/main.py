@@ -4,7 +4,7 @@ import shlex
 import subprocess
 import sys
 from http.server import HTTPServer, SimpleHTTPRequestHandler, BaseHTTPRequestHandler
-from bootserver.prompt import get_ip
+from bootserver.prompt import set_ip
 from bootserver.netboot import prepare
 
 port = 8000
@@ -71,8 +71,8 @@ def daemonize():
     print(f"Started pid {process.pid}")
 
 
+set_ip()
 prepare()
-# ip = get_ip()
 # run(ip)
 # if 'daemon' in sys.argv:
 #     daemonize()
