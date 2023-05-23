@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ipxe"
+name = "bootserver"
 version = "0.1.0"
 description = ""
 authors = ["'John Syrinek' <john.syrinek@gmail.com>"]

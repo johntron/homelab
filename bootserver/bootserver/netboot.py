@@ -52,10 +52,10 @@ def clone():
 
 
 def render_chainloader():
-    print(f"Using {options.bootserver} in chainloader")
+    print(f"Using {options.address} in chainloader")
     with open(options.chainload, 'r') as f:
         template = f.read()
-    rendered = template.format(bootserver=options.bootserver)
+    rendered = template.format(bootserver=options.address)
     with open(options.chainload_output, 'w') as f:
         f.write(rendered)
     print(f"Rendered chainloader script to {options.chainload_output}")

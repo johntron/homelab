@@ -6,7 +6,7 @@ import psutil
 from .options import options
 
 
-def set_ip():
+def choose_address():
     def interfaces():
         print("Interfaces:")
         iflist = list(psutil.net_if_addrs().keys())
@@ -17,15 +17,15 @@ def set_ip():
         ifname = input(f"Which interface has the IP you'd like to use for bootserver? ({iflist[0]}) ").strip()
         return ifname
 
-    def ip(ifname):
+    def address(ifname):
         ifaddrs = psutil.net_if_addrs()[ifname]
         address = [addr.address for addr in ifaddrs if addr.family == socket.AF_INET].pop()
         print(f"Got IP {address} from {ifname}")
         return address
 
-    if options.bootserver:
-        print(f"Using {options.bootserver} for bootserver")
+    if options.address:
+        print(f"Using {options.address} for bootserver")
         return
     iflist = interfaces()
     ifname = choose_interface()
-    options.bootserver_ip = ip(ifname)
+    options.address = address(ifname)
