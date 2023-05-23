@@ -11,6 +11,8 @@ pypxe = "^1.8.4"
 psutil = "^5.9.5"
 gitpython = "^3.1.31"
 tqdm = "^4.65.0"
+yaspin = "^2.3.0"
+rich = "^13.3.5"
 
 
 [build-system]
