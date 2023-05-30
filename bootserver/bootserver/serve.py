@@ -1,18 +1,13 @@
 import asyncio
 
-from bootserver.http import HTTPProtocol
-from bootserver.options import options
-from bootserver.tftp import TFTPProtocol
+from bootserver import http, tftp
 
 
 async def run_servers():
     loop = asyncio.get_running_loop()
 
-    udp_transport, udp_protocol = await loop.create_datagram_endpoint(
-        lambda: TFTPProtocol(options.address, loop, {}), local_addr=(options.address, 69)
-    )
-
-    http_server = await loop.create_server(lambda: HTTPProtocol(), options.address, 8080)
+    udp_transport, udp_protocol = await tftp.serve()
+    http_server = await http.serve()
 
     try:
         await asyncio.Future()

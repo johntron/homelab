@@ -1,3 +1,4 @@
+import asyncio
 import os
 import pathlib
 
@@ -25,3 +26,12 @@ class TFTPProtocol(TFTPServerProtocol):
             raise NotImplementedError("Writing is not supported")
         else:
             return lambda filename, opts: FileReader(filename, opts, packet.mode)
+
+
+async def serve():
+    loop = asyncio.get_event_loop()
+    udp_transport, udp_protocol = await loop.create_datagram_endpoint(
+        lambda: TFTPProtocol(options.address, loop, {}), local_addr=(options.address, 69)
+    )
+    print(f'TFTP listening on {options.address}:69')
+    return udp_transport, udp_protocol
