@@ -1,22 +1,27 @@
-import threading
+import os
+import pathlib
 
-from time import sleep
+from py3tftp import file_io
+from py3tftp.protocols import TFTPServerProtocol
 
-from pypxe import tftp
-
-from .options import options
+from bootserver.options import options
 
 
-def serve():
-    tftp_server = tftp.TFTPD(
-        netboot_directory=options.static,
-        mode_verbose=True,
-        mode_debug=True,
-        # port=args.TFTP_PORT,
-        ip=options.address
-    )
-    tftpd = threading.Thread(target=tftp_server.listen)
-    tftpd.daemon = True
-    tftpd.start()
-    while tftpd.is_alive():
-        sleep(1)
+class FileReader(file_io.FileReader):
+    def __init__(self, fname, chunk_size=0, mode=None):
+        self._f = None
+        self.fname = pathlib.Path(options.static) / os.fsdecode(fname)
+        self.chunk_size = chunk_size
+        self._f = self._open_file()
+        self.finished = False
+        if mode:
+            print(f"Ignoring mode {mode.decode('utf-8')}")
+        print(f"Reading {self.fname}")
+
+
+class TFTPProtocol(TFTPServerProtocol):
+    def select_file_handler(self, packet):
+        if packet.is_wrq():
+            raise NotImplementedError("Writing is not supported")
+        else:
+            return lambda filename, opts: FileReader(filename, opts, packet.mode)

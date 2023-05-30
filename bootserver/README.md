@@ -1,4 +1,21 @@
-## Building
+## Running
+
+Prepare:
+
+```shell
+poetry install
+poetry run python3 -m bootserver prepare
+```
+
+Run - uses privileged port 69, so must use sudo:
+```shell
+sudo (which poetry) install
+sudo (which poetry) run python3 -m bootserver run
+```
+
+## Building iPXE
+
+Follow these instructions to build iPXE alone without bootserver.
 
 Install dependencies:
 
@@ -15,13 +32,6 @@ cp ipxe/src/bin-x86_64-efi/ipxe.efi bootserver/
 ```
 
 Note: if using older hardware, the UNDI-only iPXE might work better. e.g. make bin/undionly.kpxe
-
-## Running the bootserver
-
-```shell
-cd bootserver/
-sudo python3 -m http.server
-```
 
 ## Configuring DHCP server
 

@@ -11,16 +11,6 @@ from rich.console import Console
 from .options import options
 
 
-# class CloneProgress(RemoteProgress):
-#     def __init__(self):
-#         super().__init__()
-#         self.pbar = tqdm(colour="blue")
-#
-#     def update(self, op_code, cur_count, max_count=None, message=''):
-#         self.pbar.total = max_count
-#         self.pbar.n = cur_count
-#         self.pbar.refresh()
-
 class RichProgress(RemoteProgress):
     def __init__(self, progress: Progress):
         self.progress = progress
@@ -31,10 +21,7 @@ class RichProgress(RemoteProgress):
     def update(self, op_code, cur_count, max_count=None, message=''):
         operation = op_code & RemoteProgress.OP_MASK
         stage = op_code & RemoteProgress.STAGE_MASK
-        # print(f'op_code: {op_code}, cur_count: {cur_count}, max_count: {max_count}, message: {message}')
-        # print(self._cur_line)
         self.progress.update(self.task, total=max_count, completed=cur_count, description=message or self.title)
-        # self.progress.update(self.task, completed=float(cur_count) / max_count)
 
 
 def clone():
@@ -68,8 +55,6 @@ def build():
         f"bin-x86_64-efi/ipxe.efi "
         f"EMBED={os.path.abspath(options.chainload_output)}"  # not an environment variable
     )
-    # sp = yaspin(Spinners.moon, text="building iPXE")
-    # sp.start() if not options.verbose else None
     with Progress(BarColumn(), TextColumn(' {task.description}'), transient=True) as p:
         p.add_task('Building', start=False)
         result = subprocess.run(
@@ -98,3 +83,4 @@ def prepare():
     render_chainloader()
     build()
     install()
+    print("Done 🎉")

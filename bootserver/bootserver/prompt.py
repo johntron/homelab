@@ -27,5 +27,5 @@ def choose_address():
         print(f"Using {options.address} for bootserver")
         return
     iflist = interfaces()
-    ifname = choose_interface()
-    options.address = address(ifname)
+    options.ifname = choose_interface()
+    options.address = address(options.ifname)

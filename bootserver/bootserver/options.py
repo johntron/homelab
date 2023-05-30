@@ -1,4 +1,6 @@
 import argparse
+import os
+import pathlib
 from os import path
 
 
@@ -7,9 +9,10 @@ def help(help: str):
 
 
 def common_arguments(parser: argparse.ArgumentParser):
+    parser.add_argument("--ifname", '-i', help=help('Network interface for bootserver to listen on'))
     parser.add_argument("--address", '-a', help=help('Address for bootserver to listen on'))
     parser.add_argument('--static', '-s', help=help("Path to static files served by bootserver"),
-                        default=path.join(project_root, 'static'))
+                        default=(pathlib.Path(project_root) / 'static'))
     parser.add_argument("--verbose", '-v', help=help('Verbose output'), action='store_true')
 
 
