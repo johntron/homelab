@@ -28,6 +28,9 @@ def prepare_command(subparsers):
                         help=help('Ignore existing git working directory for iPXE'))
     parser.add_argument("--chainload", '-c', help=help('Path to template for iPXE chainload script'),
                         default=path.join(project_root, 'chainload.ipxe'))
+    parser.add_argument("--config-create-or-join",
+                        help=help('Path to template file for config-create.yaml/config-join.yaml'),
+                        default=path.join(project_root, 'config-create-or-join.yaml'))
     parser.add_argument("--chainload-output", help=help('Path to save rendered iPXE chainload script'),
                         default=path.join(project_root, 'chainload.ipxe.rendered'))
     common_arguments(parser)

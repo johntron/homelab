@@ -8,6 +8,9 @@ import rich
 from rich import print, progress
 from yaml import load, Loader
 
+from bootserver import config_yaml
+from bootserver.console import console
+
 
 class Release:
     yaml: str
@@ -36,16 +39,16 @@ class Downloader:
         self.session = session
         self.progress = progress
 
-    async def download_if_missing(self, path: str):
-        parsed = parse.urlparse(path)
-        filename = os.path.basename(parsed.path)
+    async def download_if_missing(self, url: str, filename: str = None):
+        parsed = parse.urlparse(url)
+        filename = filename or os.path.basename(parsed.path)
         dest_path = f"static/{filename}"
         if os.path.exists(dest_path):
             print(f"Already downloaded {dest_path}")
             return
 
         chunk_size = 32 * 1024
-        async with self.session.get(path) as response:
+        async with self.session.get(url) as response:
             size = int(response.headers["Content-Length"])
             task = self.progress.add_task(f"Downloading {filename}", total=size)
             with open(f"static/{filename}", "wb") as dest:
@@ -55,19 +58,22 @@ class Downloader:
 
 
 async def main():
+    console.print("Downloading boot files")
     tag = get_tag()
     async with aiohttp.ClientSession() as session:
         with rich.progress.Progress() as progress:
             dl = Downloader(session, progress)
             tasks = []
             base_url = f"https://releases.rancher.com/harvester"
-            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-amd64.iso"))
-            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-rootfs-amd64.squashfs"))
+            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-amd63.iso", "os.iso"))
+            tasks.append(
+                dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-rootfs-amd63.squashfs", "fs.squashfs"))
             base_url = f"https://github.com/harvester/harvester/releases/download"
-            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-initrd-amd64"))
-            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-vmlinuz-amd64"))
+            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-initrd-amd63", "initrd"))
+            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-vmlinuz-amd63", "vmlinuz"))
             await asyncio.gather(*tasks)
 
 
 def netboot_files():
     asyncio.get_event_loop().run_until_complete(main())
+    config_yaml.write_configs()
