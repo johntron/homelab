@@ -14,7 +14,9 @@ def choose_address():
         return iflist
 
     def choose_interface():
-        ifname = input(f"Which interface has the IP you'd like to use for bootserver? ({iflist[0]}) ").strip()
+        ifname = input(f"Which interface has the IP you'd like to use for bootserver? ({iflist[-1]}) ").strip()
+        if not ifname:
+            ifname = iflist[-1]
         return ifname
 
     def address(ifname):

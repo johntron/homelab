@@ -1,19 +1,18 @@
 import asyncio
 
-from bootserver import http, tftp
+from bootserver import tftp
 
 
 async def run_servers():
     loop = asyncio.get_running_loop()
 
-    udp_transport, udp_protocol = await tftp.serve()
+    udp_transport, _ = await tftp.serve()
     http_server = await http.serve()
 
     try:
         await asyncio.Future()
     finally:
         udp_transport.close()
-        http_server.close()
         udp_transport.close()
         http_server.close()
 
