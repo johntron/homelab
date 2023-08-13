@@ -50,7 +50,7 @@ class SimpleHTTPProtocol(asyncio.Protocol):
 async def serve():
     server = await asyncio.get_event_loop().create_server(
         lambda: SimpleHTTPProtocol(),
-        options.address, 8080
+        options.address, options.http_port
     )
-    print(f'HTTP listening on {options.address}:8080')
+    print(f'HTTP listening on {options.address}:{options.http_port}')
     return server

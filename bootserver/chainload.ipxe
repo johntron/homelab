@@ -15,4 +15,4 @@ show gateway ||
 show asset ||
 
 chain http://{bootserver}:8000/?mac=${{net0/mac:uristring}} ||
-
+# chain --autofree http://boot.netboot.xyz/ipxe/netboot.xyz.lkrn

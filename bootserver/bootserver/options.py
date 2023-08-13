@@ -12,12 +12,13 @@ def help(help: str):
 def common_arguments(parser: argparse.ArgumentParser):
     parser.add_argument("--ifname", '-i', help=help('Network interface for bootserver to listen on'))
     parser.add_argument("--address", '-a', help=help('Address for bootserver to listen on'))
+    parser.add_argument("--http-port", help=help('Port for HTTP server to listen on'), default=8080)
     parser.add_argument('--static', '-s', help=help("Path to static files served by bootserver"),
                         default=(pathlib.Path(project_root) / 'static'))
     parser.add_argument("--verbose", '-v', help=help('Verbose output'), action='store_true')
 
 
-def prepare_command(subparsers):
+def add_prepare_command(subparsers):
     parser = subparsers.add_parser('prepare', description="Clone, configure, and build iPXE with chainloader")
     parser.add_argument('--ipxe', help=help("Path to iPXE git working directory"),
                         default=path.join(project_root, 'ipxe'))
@@ -37,14 +38,20 @@ def prepare_command(subparsers):
     return parser
 
 
-def run_command(subparsers):
+def add_run_command(subparsers):
     parser = subparsers.add_parser('run', description="Serves iPXE over TFTP")
+    common_arguments(parser)
+
+
+def add_inventory_command(subparsers):
+    subparsers.add_parser('inventory', description="Lists inventory")
     common_arguments(parser)
 
 
 parser = argparse.ArgumentParser(prog="bootserver",
                                  description="Bootstraps a bare metal server with an operating system")
 subparsers = parser.add_subparsers(title="subcommands", dest='command', required=True)
-prepare_command(subparsers)
-run_command(subparsers)
+add_prepare_command(subparsers)
+add_run_command(subparsers)
+add_inventory_command(subparsers)
 options = parser.parse_args()

@@ -1,5 +1,6 @@
 import asyncio
 import os
+import pathlib
 from urllib import parse, request
 
 import aiohttp
@@ -9,6 +10,7 @@ from rich import print, progress
 from yaml import load, Loader
 
 from bootserver import config_yaml
+from bootserver import options
 from bootserver.console import console
 
 
@@ -42,16 +44,18 @@ class Downloader:
     async def download_if_missing(self, url: str, filename: str = None):
         parsed = parse.urlparse(url)
         filename = filename or os.path.basename(parsed.path)
-        dest_path = f"static/{filename}"
+        dest_path = (pathlib.Path(options.project_root) / "static" / filename)
         if os.path.exists(dest_path):
             print(f"Already downloaded {dest_path}")
             return
 
         chunk_size = 32 * 1024
         async with self.session.get(url) as response:
+            if response.status != 200:
+                raise Exception(f"Unexpected response {response.status} downloading {url}")
             size = int(response.headers["Content-Length"])
             task = self.progress.add_task(f"Downloading {filename}", total=size)
-            with open(f"static/{filename}", "wb") as dest:
+            with open(dest_path, "wb") as dest:
                 async for chunk in response.content.iter_chunked(chunk_size):
                     dest.write(chunk)
                     self.progress.update(task, advance=chunk_size)
@@ -65,12 +69,12 @@ async def main():
             dl = Downloader(session, progress)
             tasks = []
             base_url = f"https://releases.rancher.com/harvester"
-            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-amd63.iso", "os.iso"))
+            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-amd64.iso", "os.iso"))
             tasks.append(
-                dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-rootfs-amd63.squashfs", "fs.squashfs"))
+                dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-rootfs-amd64.squashfs", "fs.squashfs"))
             base_url = f"https://github.com/harvester/harvester/releases/download"
-            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-initrd-amd63", "initrd"))
-            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-vmlinuz-amd63", "vmlinuz"))
+            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-initrd-amd64", "initrd"))
+            tasks.append(dl.download_if_missing(f"{base_url}/{tag}/harvester-{tag}-vmlinuz-amd64", "vmlinuz"))
             await asyncio.gather(*tasks)
 
 

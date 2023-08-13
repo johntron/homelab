@@ -1,36 +1,9 @@
+import dataclasses
 import string
 
+from bootserver import inventory
 from bootserver.console import console
 from bootserver.options import options
-
-
-def configs():
-    base_config = {
-        "cluster_vip": "192.168.1.32",
-        "token": "",
-        "ssh_authorized_key": "github:johntron",
-        "shell_password": "",
-        "target_drive": "/dev/nvme0n1",
-        "iso_url": f"http://{options.address}/os.iso",
-    }
-
-    return {
-        "tiny1": {
-            **base_config,
-            "mode": "create",
-            "hostname": "tiny2",
-        },
-        "tiny2": {
-            **base_config,
-            "mode": "join",
-            "hostname": "tiny1",
-        },
-        "itx1": {
-            **base_config,
-            "mode": "join",
-            "hostname": "itx1",
-        }
-    }
 
 
 def write_configs():
@@ -39,7 +12,14 @@ def write_configs():
     with open(options.config_create_or_join, "r") as f:
         template = f.read()
     template = string.Template(template)
-    for name, config in configs().items():
-        with open(f"{options.static}/config-{name}.yaml", "w") as f:
-            compiled = template.substitute(config)
+    cluster = inventory.cluster()
+    for node in inventory.all_nodes():
+        out = f"{options.static}/config-{node.hostname}.yaml"
+        with open(out, "w") as f:
+            mappings = {
+                **dataclasses.asdict(cluster),
+                **dataclasses.asdict(node)
+            }
+            compiled = template.substitute(mappings)
             f.write(compiled)
+            console.print(f"Wrote config for {node.hostname} to {out}")
