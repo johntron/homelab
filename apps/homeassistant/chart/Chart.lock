@@ -1,0 +1,15 @@
+dependencies:
+- name: common
+  repository: https://library-charts.k8s-at-home.com
+  version: 4.5.2
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 11.6.12
+- name: mariadb
+  repository: https://charts.bitnami.com/bitnami
+  version: 11.0.14
+- name: influxdb
+  repository: https://charts.bitnami.com/bitnami
+  version: 5.3.5
+digest: sha256:e122c8b0defe7942e6b5c797bff0347a17da5a264f0733b3f6987251fca7613f
+generated: "2022-08-02T14:34:57.344877538Z"
