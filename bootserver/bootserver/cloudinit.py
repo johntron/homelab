@@ -1,4 +1,6 @@
-from bootserver import distro_files
+from bootserver import distro_files, config_yaml
+
 
 def prepare():
-    files = distro_files.netboot_files()
+    distro_files.netboot_files()
+    config_yaml.write_configs()

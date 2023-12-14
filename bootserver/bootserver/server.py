@@ -5,14 +5,14 @@ import sys
 from rich import padding, syntax
 
 from bootserver import http_server
-from bootserver import tftp
+from bootserver import tftp_server
 from bootserver.console import console
 
 
 async def run_servers():
     loop = asyncio.get_running_loop()
 
-    udp_transport, _ = await tftp.serve()
+    udp_transport, _ = await tftp_server.serve()
     server = await http_server.serve()
 
     try:

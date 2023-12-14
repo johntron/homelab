@@ -9,7 +9,6 @@ import rich
 from rich import print, progress
 from yaml import load, Loader
 
-from bootserver import config_yaml
 from bootserver import options
 from bootserver.console import console
 
@@ -64,6 +63,7 @@ class Downloader:
 async def main():
     console.print("Downloading boot files")
     tag = get_tag()
+    console.print(f"Latest version is {tag}")
     async with aiohttp.ClientSession() as session:
         with rich.progress.Progress() as progress:
             dl = Downloader(session, progress)
@@ -80,4 +80,3 @@ async def main():
 
 def netboot_files():
     asyncio.get_event_loop().run_until_complete(main())
-    config_yaml.write_configs()

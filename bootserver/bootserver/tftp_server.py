@@ -10,6 +10,7 @@ from bootserver.options import options
 
 class FileReader(file_io.FileReader):
     def __init__(self, fname, chunk_size=0, mode=None):
+        print(f"Sending{fname}")
         self._f = None
         self.fname = pathlib.Path(options.static) / os.fsdecode(fname)
         self.chunk_size = chunk_size
@@ -17,7 +18,6 @@ class FileReader(file_io.FileReader):
         self.finished = False
         if mode:
             print(f"Ignoring mode {mode.decode('utf-8')}")
-        print(f"Reading {self.fname}")
 
 
 class TFTPProtocol(TFTPServerProtocol):

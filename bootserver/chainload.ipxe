@@ -14,5 +14,8 @@ show dns ||
 show gateway ||
 show asset ||
 
-chain http://{bootserver}:8000/?mac=${{net0/mac:uristring}} ||
+kernel harvester-v1.1.2-vmlinuz ip=dhcp net.ifnames=1 rd.cos.disable rd.noverifyssl console=tty1 root=live:http://{options.address}:{options.http_port}/fs.squashfs harvester.install.automatic=true harvester.install.config_url=http://{options.address}:{options.http_port}/config-tiny1.yaml
+initrd harvester-v1.1.2-initrd
+boot
+# chain http://{options.address}:{options.http_port}/?mac=${{net0/mac:uristring}} ||
 # chain --autofree http://boot.netboot.xyz/ipxe/netboot.xyz.lkrn

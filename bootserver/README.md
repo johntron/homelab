@@ -12,6 +12,20 @@ Run - uses privileged port 69, so must use sudo:
 sudo (which poetry) install
 sudo (which poetry) run python3 -m bootserver run
 ```
+## Configuring DHCP server
+
+1. Set next-server to IP of bootserver
+2. Set boot filename to "ipxe.efi"
+
+## Development roadmap
+
+1. Decide if I want to iPXE boot Harvester directly
+   2. Advantage: can specify cloud-init files directly for hands-off install
+2. ... or using netboot.xyz
+   3. Would need to follow steps on screen, but could still provide the cloud-init files
+1. Update HTTP server to return cloud-init for CREATE and one for JOIN - conf options are in cloud-init.py
+   2. Need to store secrets securely
+
 
 ## Building iPXE
 
@@ -32,11 +46,6 @@ cp ipxe/src/bin-x86_64-efi/ipxe.efi bootserver/
 ```
 
 Note: if using older hardware, the UNDI-only iPXE might work better. e.g. make bin/undionly.kpxe
-
-## Configuring DHCP server
-
-1. Set next-server to IP of bootserver
-2. Set boot filename to "ipxe.efi"
 
 ## Device ID
 

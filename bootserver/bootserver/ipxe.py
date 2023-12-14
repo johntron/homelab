@@ -4,9 +4,9 @@ import shutil
 import subprocess
 
 from git import Repo, RemoteProgress
-from rich.progress import Progress, BarColumn, TextColumn
 from rich import print
 from rich.console import Console
+from rich.progress import Progress, BarColumn, TextColumn
 
 from .options import options
 
@@ -42,7 +42,7 @@ def render_chainloader():
     print(f"Using {options.address} in chainloader")
     with open(options.chainload, 'r') as f:
         template = f.read()
-    rendered = template.format(bootserver=options.address)
+    rendered = template.format(options=options)
     with open(options.chainload_output, 'w') as f:
         f.write(rendered)
     print(f"Rendered chainloader script to {options.chainload_output}")
