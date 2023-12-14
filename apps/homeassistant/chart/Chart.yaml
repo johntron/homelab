@@ -3,7 +3,7 @@ annotations:
     - kind: changed
       description: Upgraded `common` chart dependency to version 4.5.2
 apiVersion: v2
-appVersion: 2022.5.4
+appVersion: 2023.12.2
 dependencies:
 - name: common
   repository: https://library-charts.k8s-at-home.com
