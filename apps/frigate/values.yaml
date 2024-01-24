@@ -1,0 +1,41 @@
+config: |
+  mqtt:
+    host: "192.168.1.70"
+    port: 1883
+  detectors:
+    foo:
+      type: openvino
+      model:
+        path: /openvino-model/ssdlite_mobilenet_v2.xml
+  model:
+    width: 300
+    height: 300
+    input_tensor: nhwc
+    input_pixel_format: bgr
+    labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+  record:
+    enabled: True
+    retain:
+      days: 30
+  ui:
+    use_experimental: True
+  cameras:
+    # Define at least one camera
+    driveway:
+      ffmpeg:
+        inputs:
+          - path: rtsp://admin:snip@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0
+            roles:
+              - detect
+              - record
+      detect:
+        width: 3840
+        height: 1920
+
+service:
+  # -- Type of Service to use
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.71
+  externalIPs:
+  - 192.168.1.71
+  port: 80
