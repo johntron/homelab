@@ -50,6 +50,22 @@ For KVM over IP, there are additional steps:
   * google-chrome --app="http://localhost:6080/vnc.html?host=johntron-linux&port=6080"
 * Connect to the machine using the password you created when running enable-kvm.sh
 
+### MeshCentral
+
+```shell
+podman run -d --name meshcentral --rm -p 8443:443 typhonragewind/meshcentral
+echo "There's no default login - you'll need to create an account"
+open https://localhost:8443
+```
+
+### MeshCommander
+
+```shell
+podman run -d -p 127.0.0.1:3001:3000 --name meshcommander vga101/meshcommander
+open http://localhost:3001
+```
+
+
 ## Making backups to local MinIO
 
 ```shell
@@ -78,21 +94,36 @@ Now back in Longhorn, go to Settings > Backups and use:
 * s3://backups@desktop/
 * minio-backup
 
+```yaml
+apiVersion: v1
+kind: Secret
+type: Opaque
+data:
+  AWS_ACCESS_KEY_ID: Z2llandYamxiazJsbG1nVw==
+  AWS_ENDPOINTS: aHR0cDovLzE5Mi4xNjguMS4yMTc6OTAwMA==
+  AWS_SECRET_ACCESS_KEY: MmtjaEZiZzNZQm1BODIwcjZybHNwWG5DNGozbFducjU=
+metadata:
+  name: minio-backup
+  namespace: longhorn-system
+```
+
 ## Next
 
 * Use Windows VM to create BIOS upgrade media for tiny1/2
 * ... try to enable KVM on tiny2?
+* Use router as DNS, so I can use custom domain? (updates to Rancher config)
 * Find some way to avoid changing EDID's (1920 for itx, 1280 for minis)
 * RouterOS terraform to turn on netboot.xyz via PXE boot
 * cloud-config server for Harvester
-* Use terraform to create volumes
-* Terraform minio server for S3 backup server
+* Use terraform to create volumes: home assistant and ghost
+* Restore Longhorn backups from S3 by starting a minio backup server (instructions above)
 * ... or ...
 * Use something like busybox to mount volumes and copy files to them
 * Terraform for metallb
 * ... home assistant
 * ... ghost
 * Terraform for Meshcommander to access KVM on tiny1?
+* Delete S3 backups from gdrive?
 
 ## Quirks
 

@@ -1,0 +1,26 @@
+# this file uses Python's string.Template()
+scheme_version: 1
+token: $token
+os:
+  hostname: $hostname
+  ssh_authorized_keys:
+    - $ssh_authorized_key
+  password: $shell_password
+  ntp_servers:
+    - 0.suse.pool.ntp.org
+    - 1.suse.pool.ntp.org
+install:
+  mode: $mode
+  management_interface:
+    interfaces:
+      - name: ens5
+    default_route: true
+    method: dhcp
+    bond_options:
+      mode: balance-tlb
+      miimon: 100
+  device: /dev/nvme0
+  #  data_disk: /dev/sdb # It is recommended to use a separate disk to store VM data
+  iso_url: $iso_url
+  vip: $cluster_vip
+  vip_mode: static

@@ -1,0 +1,58 @@
+# Extras:
+# system_settings.backup-target https://docs.harvesterhci.io/v1.1/advanced/settings#backup-target
+# system_settings.storage_network https://docs.harvesterhci.io/v1.1/advanced/settings#storage-network
+
+scheme_version: 1
+#server_url: https://$cluster_vip:443
+token: $token
+os:
+  ssh_authorized_keys:
+    - $ssh_authorized_key
+  write_files:
+#  - encoding: ""
+#    content: test content
+#    owner: root
+#    path: /etc/test.txt
+#    permissions: '0755'
+  hostname: $hostname
+  modules:
+    - kvm
+    - nvme
+    - vhost_net
+  sysctls:
+    kernel.printk: "4 4 1 7"
+    kernel.kptr_restrict: "1"
+  dns_nameservers:
+    - $dns_nameserver
+  ntp_servers:
+    - 0.suse.pool.ntp.org
+    - 1.suse.pool.ntp.org
+  password: $shell_password
+  environment:
+#    http_proxy: http://myserver
+#    https_proxy: http://myserver
+  labels:
+    topology.kubernetes.io/zone: zone1
+#    foo: bar
+#    mylabel: myvalue
+install:
+  mode: create
+  management_interface:
+    interfaces:
+    - name: eno1
+#      hwAddr: "B8:CA:3A:6A:64:7C"
+    method: dhcp
+#  force_efi: true
+  device: $target_drive
+#  silent: true
+  iso_url: $iso_url
+#  poweroff: true
+#  no_format: true
+  debug: true
+  tty: ttyS0
+  vip: $cluster_vip
+  vip_hw_addr: b0:22:7a:00:00:00
+  vip_mode: dhcp
+#  force_mbr: false
+system_settings:
+  auto-disk-provision-paths: "/dev/nvme*"
