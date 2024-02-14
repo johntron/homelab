@@ -9,6 +9,106 @@
 * [Making backups to local MinIO](#making-backups-to-local-minio)
 <!-- TOC -->
 
+## Goal
+
+Simple (relatively), flexible cluster with good uptime for "production" services, and flexibility to experiment
+
+## Objectives
+* mostly-identical infra on all nodes
+* high-availability control plane
+* fault tolerance for volumes
+* durable storage for backups
+* smart scheduling based on workload requirements
+* ephemeral storage for ops purposes
+
+## Inventory
+
+Nodes:
+* 1x Pi5
+* 2x Pi4
+* 3x TinyMiniMicro
+
+Storage:
+* 512GB partitions on most devices
+* NVMe for all but one 512GB partition (USB 3 SSD)
+* 4TB NVMe drive in Pi5 with two partitions: 512GB and 3.5TB
+* 1TB USB 3 SSD on one Pi4 - two 512GB partitions
+* 32GB micro SD card on other Pi4
+* 2x 512GB NVMe's in all TinyMiniMicro nodes
+
+Network:
+* Everything plugged into a 1Gbe switch
+
+## Configuration
+
+* Talos Linux on everything that supports it (all but Pi5)
+* 5x control nodes - all but Pi5
+* 5x worker nodes: all but Pi5
+* Most apps scheduled on TinyMiniMicro
+* Apps requiring special devices (e.g. Z-wave controller) scheduled on Pi4 w/USB SSD
+* Ephemeral storage on Pi5
+
+Primary MinIO cluster:
+* Uses 512GB partitions available on most devices
+* Excludes SD-card-only Pi4 and 3.5TB partition on Pi5
+
+## Fault tolerance
+
+* If worker node goes down, scheduler can reschedule on another node, because storage would have been replicated there previously
+* MinIO with erasure coding (N/2) on all nodes except the SD-card-only Pi4
+* Longhorn replicates all volumes to all nodes except the SD-card only Pi4
+* Longhorn backs up to MinIO
+
+
+## Flexibility
+
+* Pi 5 has additional MinIO instance (SNSD) in addition to the one with erasure coding. This is to use for ad-hoc storage or manual backups already replicated elsewhere
+* Can remove a device and create a separate cluster for testing, upgrading, etc.
+* Configuration as code for quick changes (Terraform)
+* Rancher for easy monitoring and management
+
+## Questions
+
+* Assuming one drive has a lot more storage than the others, with MinIO is there any benefit to creating multiple partitions for MinIO on this drive? Consider erasure coding.
+* How do I benchmark MinIO performance to ensure the 1Gbe links are being fully-saturated?
+* How can I ensure special hardware is available when needed, and low-performance hardware is avoided? e.g. resource-based scheduling, affinity/anti-affinity rules, or taints and tolerations
+* If worker node goes down, workloads should be rescheduled on remaining nodes. Assuming volumes were already replicated to all nodes, will Longhorn handle this automatically?
+* What happens when all power is lost?
+* How often should Longhorn backup? Retention policy?
+* How can I create fault-tolerant storage for Home Assistant?
+* How can I grant unfettered access to an Aeotec USB Z-Wave controller on the Pi4?
+* How can I manage configuration for production cluster and experimental cluster? Note: I need to remove a node to support this
+* How do I test fault tolerance of Longhorn PVs and MinIO nodes?
+
+## Next steps
+
+Imaging:
+* Share network on ethernet and plug in Pi4
+* Use Pi imager to update Pi4 to boot from USB
+* Use Pi imager to create image on USB for Talos
+* Insert USB drive into Pi4 and boot - ensure accessible via talosctl
+Experimenting:
+* Record storage devices and NIC MAC
+* Figure out how to save secrets generated during Talos provisioning
+* Install Talos with two equal-size partitions: one for Longhorn (mount at /var/lib/longhorn), one for MinIO
+* Enable as worker node
+* Create Kubernetes cluster
+* Install Longhorn
+* Install MinIO
+* Configure Longhorn to backup to MinIO
+* Join MinIO with Pi 5
+* Determine if Z-wave controller can run in Kubernetes with device passthrough
+Reproducing:
+* Save the secrets somewhere
+* Redo the above in Terraform
+Making durable:
+* Repeat on one existing TinyMiniMicro node - join to Pi4 as control + worker
+* Repeat on another
+* Ensure MinIO is now using erasure coding
+* Ensure Longhorn replication and workload affinity makes sense
+* Test failure scenario
+* Add final TinyMiniMicro node
+
 ## Install
 
 ```
@@ -99,9 +199,9 @@ apiVersion: v1
 kind: Secret
 type: Opaque
 data:
-  AWS_ACCESS_KEY_ID: Z2llandYamxiazJsbG1nVw==
+  AWS_ACCESS_KEY_ID: 
   AWS_ENDPOINTS: aHR0cDovLzE5Mi4xNjguMS4yMTc6OTAwMA==
-  AWS_SECRET_ACCESS_KEY: MmtjaEZiZzNZQm1BODIwcjZybHNwWG5DNGozbFducjU=
+  AWS_SECRET_ACCESS_KEY: 
 metadata:
   name: minio-backup
   namespace: longhorn-system
