@@ -1,0 +1,1 @@
+Downloaded from https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.27.1/controller.yaml
