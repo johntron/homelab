@@ -24,7 +24,7 @@ config: |
     driveway:
       ffmpeg:
         inputs:
-          - path: rtsp://admin:snip@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0
+          - path: rtsp://admin:3RX^pPzthCSQW8W4@192.168.1.202:554/cam/realmonitor?channel=1&subtype=0
             roles:
               - detect
               - record

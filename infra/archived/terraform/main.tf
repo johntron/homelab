@@ -1,3 +1,0 @@
-module "harvester" {
-  source = "./harvester"
-}

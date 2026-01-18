@@ -1,0 +1,169 @@
+@startuml star
+!define ShowIpAddresses
+!define ShowMacAddresses
+!include <C4/C4_Context>
+
+SHOW_LEGEND()
+
+System_Boundary(c1, "Homelab Network") {
+
+    Person_Ext(user, "User", "Uses homelab resources")
+
+    System(router, "Router", "Internet access, firewall, DHCP")
+
+    System(core_switch, "Core Switch", "Managed switch with VLANs and LAG", $tags="primary")
+
+    System(iot_switch, "IoT Switch", "Unmanaged switch", $tags="secondary")
+    System(mgmt_switch, "Management Switch", "Unmanaged switch", $tags="secondary")
+    System(k8s_switch, "Kubernetes Switch", "Unmanaged switch", $tags="secondary")
+
+    SystemDb(nas, "NAS", "Network Attached Storage", $tags="secondary")
+
+    System(wap1, "WAP 1", "Wireless Access Point", $tags="secondary")
+    System(wap2, "WAP 2", "Wireless Access Point", $tags="secondary")
+    System(wap3, "WAP 3", "Wireless Access Point", $tags="secondary")
+
+    System(k8s_node1, "Kubernetes Node 1", "", $tags="secondary")
+    System(k8s_node2, "Kubernetes Node 2", "", $tags="secondary")
+    System(k8s_node3, "Kubernetes Node 3", "", $tags="secondary")
+
+    System(pikvm, "Pi-KVM", "", $tags="secondary")
+    System(sdr, "SDR", "Software Defined Radio", $tags="secondary")
+
+    System_Boundary(k8s_cluster, "Kubernetes Cluster") {
+        System(smart_home, "Smart Home Hub", "Virtual", $tags="secondary")
+        System(nvm, "NVM", "Virtual", $tags="secondary")
+    }
+
+    Rel(user, router, "Uses internet", "WiFi, Ethernet")
+    Rel(router, core_switch, "1 Gigabit Ethernet")
+
+    Rel(core_switch, iot_switch, "1 Gigabit Ethernet, VLAN 20 (IoT)")
+    Rel(core_switch, mgmt_switch, "1 Gigabit Ethernet, VLAN 30 (Management)")
+    Rel(core_switch, k8s_switch, "1 Gigabit Ethernet, VLAN 40 (Kubernetes)")
+    Rel(core_switch, nas, "1 Gigabit Ethernet, VLAN 50 (Storage)")
+    Rel(core_switch, wap1, "1 Gigabit Ethernet, PoE+, VLAN 10 (Main)")
+    Rel(core_switch, wap2, "1 Gigabit Ethernet, PoE+, VLAN 10 (Main)")
+    Rel(core_switch, wap3, "1 Gigabit Ethernet, PoE+, VLAN 10 (Main)")
+
+    Rel(iot_switch, "SecurityCameras", "2x", "1 Gigabit Ethernet, PoE")
+    Rel(iot_switch, "ZWaveController", "", "1 Gigabit Ethernet")
+    Rel(iot_switch, "Doorbell", "", "1 Gigabit Ethernet, PoE")
+    Rel(iot_switch, "Appliances", "3x", "1 Gigabit Ethernet")
+    Rel(iot_switch, "Assistants", "3x", "1 Gigabit Ethernet")
+    Rel(iot_switch, "Thermostats", "2x", "1 Gigabit Ethernet")
+    Rel(iot_switch, "RobotCleaners", "2x", "1 Gigabit Ethernet")
+    Rel(iot_switch, "GarageDoor", "", "1 Gigabit Ethernet")
+
+    Rel(mgmt_switch, pikvm, "", "1 Gigabit Ethernet")
+    Rel(mgmt_switch, sdr, "", "1 Gigabit Ethernet")
+
+    Rel(k8s_switch, k8s_node1, "", "1 Gigabit Ethernet")
+    Rel(k8s_switch, k8s_node2, "", "1 Gigabit Ethernet")
+    Rel(k8s_switch, k8s_node3, "", "1 Gigabit Ethernet")
+
+    Rel(k8s_node1, smart_home, "")
+    Rel(k8s_node2, nvm, "")
+
+    Rel(user, wap1, "Uses WiFi", "WiFi")
+    Rel(user, wap2, "Uses WiFi", "WiFi")
+    Rel(user, wap3, "Uses WiFi", "WiFi")
+
+    Rel(user, "Laptops", "4x", "WiFi, Ethernet")
+    Rel(user, "Desktop", "", "Ethernet")
+    Rel(user, "iPad", "", "WiFi")
+    Rel(user, "Smartphones", "2x", "WiFi")
+    Rel(user, "SmartTVs", "2x", "WiFi, Ethernet")
+    Rel(user, "StereoComponents", "2x", "Ethernet")
+    Rel(user, "Chromecast", "", "WiFi")
+
+    Rel(user, nas, "Accesses files", "SMB/NFS")
+    Rel(user, smart_home, "Controls smart home", "API")
+    Rel(user, nvm, "Accesses NVM", "API")
+    Rel(user, sdr, "Uses SDR", "API")
+}
+@enduml
+
+@startuml hybrid
+!define ShowIpAddresses
+!define ShowMacAddresses
+!include <C4/C4_Context>
+
+SHOW_LEGEND()
+
+System_Boundary(c1, "Homelab Network") {
+
+    Person_Ext(user, "User", "Uses homelab resources")
+
+    System(router, "Router", "Internet access, firewall, DHCP")
+
+    System(core_switch1, "Core Switch 1", "Managed switch with VLANs and LAG", $tags="primary")
+    System(core_switch2, "Core Switch 2", "Managed switch with VLANs and LAG", $tags="primary")
+
+    System(mgmt_switch, "Management Switch", "Unmanaged switch", $tags="secondary")
+    System(k8s_switch, "Kubernetes Switch", "Unmanaged switch", $tags="secondary")
+
+    SystemDb(nas, "NAS", "Network Attached Storage", $tags="secondary")
+
+    System(wap1, "WAP 1", "Wireless Access Point", $tags="secondary")
+    System(wap2, "WAP 2", "Wireless Access Point", $tags="secondary")
+    System(wap3, "WAP 3", "Wireless Access Point", $tags="secondary")
+
+    System(k8s_node1, "Kubernetes Node 1", "", $tags="secondary")
+    System(k8s_node2, "Kubernetes Node 2", "", $tags="secondary")
+    System(k8s_node3, "Kubernetes Node 3", "", $tags="secondary")
+
+    System(pikvm, "Pi-KVM", "", $tags="secondary")
+    System(sdr, "SDR", "Software Defined Radio", $tags="secondary")
+    System(zwave, "Z-Wave Controller", "", $tags="secondary")
+
+    System_Boundary(k8s_cluster, "Kubernetes Cluster") {
+        System(smart_home, "Smart Home Hub", "Virtual", $tags="secondary")
+        System(nvm, "NVM", "Virtual", $tags="secondary")
+    }
+
+    Rel(user, router, "Uses internet", "WiFi, Ethernet")
+
+    Rel(router, core_switch1, "1 Gigabit Ethernet")
+    Rel(router, core_switch2, "1 Gigabit Ethernet")
+
+    Rel(core_switch1, core_switch2, "1 Gigabit Ethernet (LAG)", "x2")
+
+    Rel(core_switch1, mgmt_switch, "1 Gigabit Ethernet, VLAN 30 (Management)")
+    Rel(core_switch1, k8s_switch, "1 Gigabit Ethernet, VLAN 40 (Kubernetes)")
+    Rel(core_switch2, nas, "1 Gigabit Ethernet, VLAN 50 (Storage)")
+    Rel(core_switch1, wap1, "1 Gigabit Ethernet, PoE+, VLAN 10 (Main)")
+    Rel(core_switch2, wap2, "1 Gigabit Ethernet, PoE+, VLAN 10 (Main)")
+    Rel(core_switch1, wap3, "1 Gigabit Ethernet, PoE+, VLAN 10 (Main)")
+
+    Rel(mgmt_switch, pikvm, "", "1 Gigabit Ethernet")
+    Rel(mgmt_switch, sdr, "", "1 Gigabit Ethernet")
+    Rel(mgmt_switch, zwave, "", "1 Gigabit Ethernet")
+
+    Rel(k8s_switch, k8s_node1, "", "1 Gigabit Ethernet")
+    Rel(k8s_switch, k8s_node2, "", "1 Gigabit Ethernet")
+    Rel(k8s_switch, k8s_node3, "", "1 Gigabit Ethernet")
+
+    Rel(k8s_node1, smart_home, "")
+    Rel(k8s_node2, nvm, "")
+
+    Rel(user, wap1, "Uses WiFi", "WiFi")
+    Rel(user, wap2, "Uses WiFi", "WiFi")
+    Rel(user, wap3, "Uses WiFi", "WiFi")
+
+    Rel(user, "Laptops", "4x", "WiFi")
+    Rel(user, "Laptop_Wired", "", "Ethernet, VLAN 10")
+    Rel(user, "Desktop", "", "Ethernet, VLAN 10")
+    Rel(user, "iPad", "", "WiFi")
+    Rel(user, "Smartphones", "2x", "WiFi")
+    Rel(user, "SmartTVs", "2x", "Ethernet, VLAN 10")
+    Rel(user, "StereoComponents", "2x", "Ethernet, VLAN 10")
+    Rel(user, "Chromecast", "", "Ethernet, VLAN 10")
+    Rel(user, "SecurityCameras", "2x", "WiFi")
+
+    Rel(user, nas, "Accesses files", "SMB/NFS")
+    Rel(user, smart_home, "Controls smart home", "API")
+    Rel(user, nvm, "Accesses NVM", "API")
+    Rel(user, sdr, "Uses SDR", "API")
+}
+@enduml
