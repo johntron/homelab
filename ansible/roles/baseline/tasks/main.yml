@@ -1,0 +1,175 @@
+---
+- name: Set baseline OS-specific facts
+  ansible.builtin.set_fact:
+    baseline_admin_group: "{{ 'wheel' if ansible_facts.os_family == 'RedHat' else 'sudo' }}"
+    baseline_sshd_service: "{{ 'sshd' if ansible_facts.os_family == 'RedHat' else 'ssh' }}"
+    baseline_chrony_service: "{{ 'chronyd' if ansible_facts.os_family == 'RedHat' else 'chrony' }}"
+  tags:
+    - baseline
+
+- name: Ensure baseline packages are installed
+  ansible.builtin.package:
+    name: "{{ baseline_packages }}"
+    state: present
+  tags:
+    - baseline
+    - packages
+
+- name: Validate SSH hardening safety
+  ansible.builtin.set_fact:
+    baseline_has_ssh_keys: "{{ (baseline_admin_users | selectattr('ssh_authorized_keys', 'defined') | map(attribute='ssh_authorized_keys') | sum(start=[]) | length) > 0 }}"
+  tags:
+    - baseline
+    - ssh
+
+- name: Fail when disabling password auth without keys
+  ansible.builtin.fail:
+    msg: "baseline_ssh_password_auth is 'no' but no ssh_authorized_keys are defined."
+  when:
+    - baseline_ssh_password_auth == 'no'
+    - not baseline_has_ssh_keys
+  tags:
+    - baseline
+    - ssh
+
+- name: Ensure admin users exist
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ (item.groups | default([baseline_admin_group])) | join(',') }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    state: present
+    append: true
+  loop: "{{ baseline_admin_users }}"
+  tags:
+    - baseline
+
+- name: Install admin SSH keys
+  ansible.builtin.authorized_key:
+    user: "{{ item.0.name }}"
+    key: "{{ item.1 }}"
+    state: present
+  loop: "{{ baseline_admin_users | subelements('ssh_authorized_keys', skip_missing=True) }}"
+  tags:
+    - baseline
+    - ssh
+
+- name: Read sshd_config
+  ansible.builtin.slurp:
+    src: /etc/ssh/sshd_config
+  register: baseline_sshd_config
+  tags:
+    - baseline
+    - ssh
+
+- name: Detect sshd_config include support
+  ansible.builtin.set_fact:
+    baseline_sshd_supports_include: "{{ 'sshd_config.d' in (baseline_sshd_config.content | b64decode) }}"
+  tags:
+    - baseline
+    - ssh
+
+- name: Ensure sshd_config.d exists
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    mode: "0755"
+  when: baseline_sshd_supports_include
+  tags:
+    - baseline
+    - ssh
+
+- name: Configure SSH hardening via drop-in
+  ansible.builtin.template:
+    src: sshd-hardening.conf.j2
+    dest: /etc/ssh/sshd_config.d/99-ansible-hardening.conf
+    mode: "0644"
+    owner: root
+    group: root
+  when: baseline_sshd_supports_include
+  notify: Restart sshd
+  tags:
+    - baseline
+    - ssh
+
+- name: Configure SSH hardening in sshd_config
+  ansible.builtin.blockinfile:
+    path: /etc/ssh/sshd_config
+    marker: "# {mark} ANSIBLE HARDENING"
+    block: "{{ lookup('ansible.builtin.template', 'sshd-hardening.conf.j2') }}"
+  when: not baseline_sshd_supports_include
+  notify: Restart sshd
+  tags:
+    - baseline
+    - ssh
+
+- name: Set timezone
+  ansible.builtin.timezone:
+    name: "{{ baseline_timezone }}"
+  tags:
+    - baseline
+    - time
+
+- name: Install chrony
+  ansible.builtin.package:
+    name: chrony
+    state: present
+  when: baseline_use_chrony
+  tags:
+    - baseline
+    - time
+
+- name: Enable chrony
+  ansible.builtin.service:
+    name: "{{ baseline_chrony_service }}"
+    state: started
+    enabled: true
+  when: baseline_use_chrony
+  tags:
+    - baseline
+    - time
+
+- name: Install systemd-timesyncd
+  ansible.builtin.package:
+    name: systemd-timesyncd
+    state: present
+  when:
+    - not baseline_use_chrony
+    - ansible_facts.os_family == 'Debian'
+  tags:
+    - baseline
+    - time
+
+- name: Enable systemd-timesyncd
+  ansible.builtin.service:
+    name: systemd-timesyncd
+    state: started
+    enabled: true
+  when:
+    - not baseline_use_chrony
+    - ansible_facts.os_family == 'Debian'
+  tags:
+    - baseline
+    - time
+
+- name: Install unattended-upgrades
+  ansible.builtin.package:
+    name: unattended-upgrades
+    state: present
+  when:
+    - baseline_unattended_upgrades
+    - ansible_facts.os_family == 'Debian'
+  tags:
+    - baseline
+    - packages
+
+- name: Configure unattended-upgrades
+  ansible.builtin.template:
+    src: 20auto-upgrades.j2
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    mode: "0644"
+  when:
+    - baseline_unattended_upgrades
+    - ansible_facts.os_family == 'Debian'
+  tags:
+    - baseline
+    - packages

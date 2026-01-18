@@ -1,0 +1,9 @@
+---
+profile: production
+exclude_paths:
+  - artifacts/
+  - collections/
+  - .git/
+skip_list:
+  - var-naming[no-role-prefix]
+  - yaml[comments]

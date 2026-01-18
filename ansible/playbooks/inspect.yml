@@ -1,0 +1,23 @@
+---
+- name: Inspect hosts and write fact reports
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Ensure artifacts directory exists
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/../artifacts"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      run_once: true
+      tags:
+        - inspect
+
+    - name: Write host fact report
+      ansible.builtin.copy:
+        content: "{{ ansible_facts | to_nice_json }}"
+        dest: "{{ playbook_dir }}/../artifacts/{{ inventory_hostname }}.json"
+        mode: "0644"
+      delegate_to: localhost
+      tags:
+        - inspect

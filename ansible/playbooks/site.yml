@@ -1,0 +1,14 @@
+---
+- name: Baseline configuration
+  hosts: all
+  become: true
+  roles:
+    - role: baseline
+      tags: ["baseline", "ssh", "packages", "time"]
+
+- name: Docker hosts
+  hosts: docker_hosts
+  become: true
+  roles:
+    - role: docker_host
+      tags: ["docker"]

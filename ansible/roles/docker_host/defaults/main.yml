@@ -1,0 +1,9 @@
+docker_users: []
+
+# Example:
+# docker_compose_projects:
+#   - name: media
+#     path: /opt/services/media
+#     state: present
+
+docker_compose_projects: []

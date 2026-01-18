@@ -1,0 +1,20 @@
+---
+# Baseline configuration overrides.
+# baseline_timezone: "America/Chicago"
+# baseline_unattended_upgrades: true
+# baseline_ssh_password_auth: "no"
+
+# Example admin user and SSH key.
+# baseline_admin_users:
+#   - name: ansible
+#     groups: ["sudo"]
+#     shell: /bin/bash
+#     ssh_authorized_keys:
+#       - "ssh-ed25519 AAAA..."
+
+# Docker role settings.
+# docker_users: ["ansible"]
+# docker_compose_projects:
+#   - name: example
+#     path: /opt/services/example
+#     state: present

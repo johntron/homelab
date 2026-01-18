@@ -1,0 +1,11 @@
+---
+extends: default
+rules:
+  line-length:
+    max: 120
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no']
+ignore: |
+  artifacts/
+  collections/
+  .git/

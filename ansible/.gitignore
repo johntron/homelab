@@ -1,0 +1,4 @@
+artifacts/
+collections/
+group_vars/all/vault.yml
+host_vars/*/vault.yml

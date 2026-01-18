@@ -1,0 +1,5 @@
+---
+# Example vault file. Create the real file with:
+# ansible-vault create group_vars/all/vault.yml
+#
+# secret_api_token: "replace_me"

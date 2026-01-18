@@ -1,0 +1,27 @@
+baseline_admin_users: []
+# Example:
+# baseline_admin_users:
+#   - name: ansible
+#     groups: ["sudo"]
+#     shell: /bin/bash
+#     ssh_authorized_keys:
+#       - "ssh-ed25519 AAAA..."
+
+baseline_ssh_password_auth: "yes"
+baseline_ssh_permit_root_login: "prohibit-password"
+
+baseline_timezone: "UTC"
+
+baseline_use_chrony: true
+
+baseline_packages:
+  - ca-certificates
+  - curl
+  - git
+  - htop
+  - sudo
+  - vim
+
+baseline_unattended_upgrades: false
+
+baseline_docker_users: []
