@@ -1,0 +1,152 @@
+---
+- name: Discover hosts and write artifacts
+  hosts: all
+  gather_facts: true
+  vars:
+    artifacts_dir: "{{ playbook_dir }}/../artifacts"
+    facts_dir: "{{ artifacts_dir }}/facts"
+    probes_dir: "{{ artifacts_dir }}/probes/{{ inventory_hostname }}"
+  tasks:
+    - name: Ensure artifacts directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      delegate_to: localhost
+      loop:
+        - "{{ artifacts_dir }}"
+        - "{{ facts_dir }}"
+        - "{{ probes_dir }}"
+
+    - name: Write host fact report
+      ansible.builtin.copy:
+        content: "{{ ansible_facts | to_nice_json }}"
+        dest: "{{ facts_dir }}/{{ inventory_hostname }}.json"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Check for mount command
+      ansible.builtin.shell: command -v mount
+      register: mount_cmd
+      changed_when: false
+      failed_when: false
+
+    - name: Capture mounts
+      ansible.builtin.command: mount
+      register: mount_output
+      changed_when: false
+      when: mount_cmd.rc == 0
+
+    - name: Write mounts probe
+      ansible.builtin.copy:
+        content: "{{ mount_output.stdout | default('') }}"
+        dest: "{{ probes_dir }}/mounts.txt"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Check for df command
+      ansible.builtin.shell: command -v df
+      register: df_cmd
+      changed_when: false
+      failed_when: false
+
+    - name: Capture disk usage
+      ansible.builtin.command:
+        argv:
+          - df
+          - -h
+      register: df_output
+      changed_when: false
+      when: df_cmd.rc == 0
+
+    - name: Write disk usage probe
+      ansible.builtin.copy:
+        content: "{{ df_output.stdout | default('') }}"
+        dest: "{{ probes_dir }}/df.txt"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Check for systemctl command
+      ansible.builtin.shell: command -v systemctl
+      register: systemctl_cmd
+      changed_when: false
+      failed_when: false
+
+    - name: Capture running services
+      ansible.builtin.command:
+        argv:
+          - systemctl
+          - --no-pager
+          - --type=service
+          - --state=running
+      register: systemctl_output
+      changed_when: false
+      when: systemctl_cmd.rc == 0
+
+    - name: Write services probe
+      ansible.builtin.copy:
+        content: "{{ systemctl_output.stdout | default('') }}"
+        dest: "{{ probes_dir }}/systemctl_running.txt"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Check for docker command
+      ansible.builtin.shell: command -v docker
+      register: docker_cmd
+      changed_when: false
+      failed_when: false
+
+    - name: Capture docker status
+      ansible.builtin.command:
+        argv:
+          - docker
+          - ps
+      register: docker_output
+      changed_when: false
+      when: docker_cmd.rc == 0
+
+    - name: Write docker probe
+      ansible.builtin.copy:
+        content: "{{ docker_output.stdout | default('') }}"
+        dest: "{{ probes_dir }}/docker_ps.txt"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Check for ip command
+      ansible.builtin.shell: command -v ip
+      register: ip_cmd
+      changed_when: false
+      failed_when: false
+
+    - name: Capture interface summary
+      ansible.builtin.command:
+        argv:
+          - ip
+          - -br
+          - a
+      register: ip_addr_output
+      changed_when: false
+      when: ip_cmd.rc == 0
+
+    - name: Write interface summary probe
+      ansible.builtin.copy:
+        content: "{{ ip_addr_output.stdout | default('') }}"
+        dest: "{{ probes_dir }}/ip_addr.txt"
+        mode: "0644"
+      delegate_to: localhost
+
+    - name: Capture routing table
+      ansible.builtin.command:
+        argv:
+          - ip
+          - r
+      register: ip_route_output
+      changed_when: false
+      when: ip_cmd.rc == 0
+
+    - name: Write routing table probe
+      ansible.builtin.copy:
+        content: "{{ ip_route_output.stdout | default('') }}"
+        dest: "{{ probes_dir }}/ip_route.txt"
+        mode: "0644"
+      delegate_to: localhost

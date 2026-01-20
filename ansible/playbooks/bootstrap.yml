@@ -1,0 +1,8 @@
+---
+- name: Bootstrap baseline access
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Placeholder for initial bootstrap tasks
+      ansible.builtin.debug:
+        msg: "Bootstrap playbook placeholder. Add safe, idempotent tasks here."

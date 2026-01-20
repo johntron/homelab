@@ -1,0 +1,4 @@
+---
+# High-level homelab knobs
+homelab_domain: "TODO"
+vlan_mode: "2-vlan"
